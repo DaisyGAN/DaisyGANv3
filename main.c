@@ -1021,6 +1021,7 @@ int main(int argc, char *argv[])
         if(countLines("tgmsg.txt") == 1228)
         {
             timestamp();
+            loadTable("tgdict.txt");
             trainDataset("tgmsg.txt");
             trainGenerator("out.txt");
             clearFile("tgmsg.txt");
