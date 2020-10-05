@@ -5,7 +5,12 @@
     DaisyGANv3 / PortTalbot
 */
 /*
-    $token = '<BOT KEY>';
+<?php
+
+    // file_put_contents("/var/www/html/m.txt", file_get_contents("php://input") . "\n\n", FILE_APPEND | LOCK_EX);
+    // exit;
+
+    $token = '1363743429:AAFpe5Afqfac3b2aruw7nf53GM5CuXXdE4w';
     $j = json_decode(file_get_contents("php://input"));
 
     function appendFileUnique($fp, $line)
@@ -36,14 +41,26 @@
 
         $msg = $j->{'message'}->{'text'};
         $ss = preg_replace("/[^a-z ]/", '', strtolower($msg));
-        appendFileUnique("tgmsg.txt", substr($ss, 0, 256));
-
+        //$ss = preg_replace("\b[a-z]{1,2}\b", '', $ss);
         $pp = explode(' ', $ss);
+        $pp = array_slice($pp, 0, 16);
+
+        $str = "";
         foreach($pp as $p)
-            appendFileUnique("tgdict.txt", substr($p, 0, 16));
+            if(strlen($p) <= 16)
+                $str .= $p . " ";
+        rtrim($str, ' ');
+
+        appendFileUnique("tgmsg.txt", substr($str, 0, 256));
+
+        foreach($pp as $p)
+            if(strlen($p) <= 16)
+                appendFileUnique("tgdict.txt", substr($p, 0, 16));
     }
 
     http_response_code(200);
+
+?>
 */
 
 #pragma GCC diagnostic ignored "-Wunused-result"
