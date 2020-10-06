@@ -7,7 +7,7 @@ It has an extra hidden layer, and can run in the background as a service while a
 - Compile main.c by running compile.sh
 - Update the BOT KEY / ID in the tgmain.php and copy over to your `www` directory.
 - Copy over one of the main.c binaries, such as `cfdgan` to the www directory
-- `cd` into the www diretory and execute `cfdgan` as sudo.
+- `cd` into the `www` diretory and execute `cfdgan` as sudo.
 
 ## Example Usage
 - ```./cfdgan retrain <optional file path>``` - Train the network from the provided dataset.
