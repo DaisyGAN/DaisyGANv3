@@ -1,7 +1,7 @@
 # PortTalbot
 A telegram bot based on DaisyGANv2 with some added nitro !
 
-It has an extra hidden layer, and can run in the background as a service while a PHP script aggregates data for it, the bot will re-compute it's network, and generate 10,000 quotes, every x messages that are aggregated by the PHP script.
+It has an extra hidden layer and can run in the background as a service while a PHP script aggregates data for it; the bot will re-compute its network and generate 10,000 quotes for every x messages that are aggregated by the PHP script.
 
 ## Install
 - Compile `main.c` by running `compile.sh`
