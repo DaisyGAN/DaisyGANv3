@@ -997,14 +997,17 @@ int main(int argc, char *argv[])
     printf("Running ! ...\n\n");
     while(1)
     {
-        if(countLines("tgmsg.txt") >= 1228)
+        if(countLines("tgmsg.txt") >= DATA_SIZE)
         {
             timestamp();
+            const time_t st = time(0);
             loadTable("tgdict.txt");
             trainDataset("tgmsg.txt");
             clearFile("tgmsg.txt");
             trainGenerator("out.txt");
-            printf("Just generated a new dataset.\n\n");
+            printf("Just generated a new dataset.\n");
+            timestamp();
+            printf("Time Taken: %.2f mins\n\n", ((double)(time(0)-st)) / 60.0);
         }
 
         sleep(333);
