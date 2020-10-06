@@ -1,7 +1,6 @@
 /*
 --------------------------------------------------
     91f7d09794d8da29f028e77df49d4907
-    https://github.com/DaisyGAN
 --------------------------------------------------
     DaisyGANv3 / PortTalbot
 */
@@ -50,7 +49,7 @@
         foreach($pp as $p)
             if(strlen($p) <= 16)
                 $str .= $p . " ";
-        $str = rtrim($str, ' ');
+        rtrim($str, ' ');
 
         appendFileUnique("tgmsg.txt", substr($str, 0, 256));
 
@@ -81,7 +80,8 @@
 #define uint uint32_t
 
 #define DIGEST_SIZE 16
-#define HIDDEN_SIZE 1024
+#define FIRSTLAYER_SIZE 256
+#define HIDDEN_SIZE 512
 #define DATA_SIZE 1228
 #define TABLE_SIZE_MAX 80000
 #define MESSAGE_SIZE 256
@@ -94,6 +94,8 @@ float _lrate = 0.003;
 float _lmomentum = 0.9;
 float _dropout = 0.5; //chance of neuron droput 0.3 = 30%
 
+uint _log = 0;
+
 struct
 {
     float* data;
@@ -105,13 +107,13 @@ struct
 typedef ptron;
 
 // discriminator 
-ptron d1[DIGEST_SIZE];
+ptron d1[FIRSTLAYER_SIZE];
 ptron d2[HIDDEN_SIZE];
 ptron d3[HIDDEN_SIZE];
 ptron d4;
 
 // generator
-ptron g1[DIGEST_SIZE];
+ptron g1[FIRSTLAYER_SIZE];
 ptron g2[HIDDEN_SIZE];
 ptron g3[HIDDEN_SIZE];
 ptron g4[DIGEST_SIZE];
@@ -647,8 +649,8 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
 float doDiscriminator(const float* input, const float eo)
 {
     // layer one, inputs (fc)
-    float o1[DIGEST_SIZE];
-    for(int i = 0; i < DIGEST_SIZE; i++)
+    float o1[FIRSTLAYER_SIZE];
+    for(int i = 0; i < FIRSTLAYER_SIZE; i++)
         o1[i] = doPerceptron(input, &d1[i], 0, eo);
 
     // layer two, hidden (fc expansion)
@@ -668,8 +670,8 @@ float doDiscriminator(const float* input, const float eo)
 void doGenerator(const float error, const float* input, float* output)
 {
     // layer one, inputs (fc)
-    float o1[DIGEST_SIZE];
-    for(int i = 0; i < DIGEST_SIZE; i++)
+    float o1[FIRSTLAYER_SIZE];
+    for(int i = 0; i < FIRSTLAYER_SIZE; i++)
         o1[i] = doPerceptron(input, &g1[i], error, -2);
 
     // layer two, hidden (fc expansion)
@@ -825,12 +827,15 @@ void trainDataset(const char* file)
             doGenerator(0, &input[0], &output[0]);
             doDiscriminator(&output[0], 0);
 
-            // for(int k = 0; k < DIGEST_SIZE; k++)
-            //     printf("%.2f \n", output[k]);
+            if(_log == 1)
+            {
+                for(int k = 0; k < DIGEST_SIZE; k++)
+                    printf("%.2f \n", output[k]);
 
-            // printf("\n");
-
-            // printf("Training Iteration (%u / %u) [%u / %u]\n", i+1, DATA_SIZE, j+1, TRAINING_LOOPS);
+                printf("\n");
+            }
+            if(_log == 1)
+                printf("Training Iteration (%u / %u) [%u / %u]\n", i+1, DATA_SIZE, j+1, TRAINING_LOOPS);
 
             //usleep(100000);
         }
@@ -932,18 +937,21 @@ void trainGenerator(const char* file)
             last_error = crossEntropy(sigmoid(doDiscriminator(&output[0], -2)), 1);
 
             // convert output to string of words
-            //printf("[%.2f] ", last_error);
+            if(_log == 1)
+                printf("[%.2f] ", last_error);
             for(int i = 0; i < DIGEST_SIZE; i++)
             {
                 const double ind = (output[i]+1.57079632679)*1547.304356744; //arctan conversion
                 if(output[i] != 0.0)
                 {
                     fprintf(f, "%s ", wtable[(int)ind]);
-                    //printf("%s ", wtable[(int)ind]);
+                    if(_log == 1)
+                        printf("%s ", wtable[(int)ind]);
                 }
             }
             fprintf(f, "\n");
-            //printf("\n");
+            if(_log == 1)
+                printf("\n");
 
             // back prop the generator [defunct method of backprop]
             //backpropGenerator(last_error, 0.001);
@@ -964,21 +972,21 @@ void trainGenerator(const char* file)
 int main(int argc, char *argv[])
 {
     // init discriminator
-    for(int i = 0; i < DIGEST_SIZE; i++)
+    for(int i = 0; i < FIRSTLAYER_SIZE; i++)
         createPerceptron(&d1[i], DIGEST_SIZE, 1);
     for(int i = 0; i < HIDDEN_SIZE; i++)
-        createPerceptron(&d2[i], DIGEST_SIZE, 1);
+        createPerceptron(&d2[i], FIRSTLAYER_SIZE, 1);
     for(int i = 0; i < HIDDEN_SIZE; i++)
-        createPerceptron(&d3[i], DIGEST_SIZE, 1);
+        createPerceptron(&d3[i], HIDDEN_SIZE, 1);
     createPerceptron(&d4, HIDDEN_SIZE, 1);
 
     // init generator
-    for(int i = 0; i < DIGEST_SIZE; i++)
+    for(int i = 0; i < FIRSTLAYER_SIZE; i++)
         createPerceptron(&g1[i], DIGEST_SIZE, 1);
     for(int i = 0; i < HIDDEN_SIZE; i++)
-        createPerceptron(&g2[i], DIGEST_SIZE, 1);
+        createPerceptron(&g2[i], FIRSTLAYER_SIZE, 1);
     for(int i = 0; i < HIDDEN_SIZE; i++)
-        createPerceptron(&g3[i], DIGEST_SIZE, 1);
+        createPerceptron(&g3[i], HIDDEN_SIZE, 1);
     for(int i = 0; i < DIGEST_SIZE; i++)
         createPerceptron(&g4[i], HIDDEN_SIZE, 1);
 
@@ -990,6 +998,7 @@ int main(int argc, char *argv[])
     {
         if(strcmp(argv[1], "retrain") == 0)
         {
+            _log = 1;
             trainDataset(argv[2]);
             exit(0);
         }
@@ -999,6 +1008,7 @@ int main(int argc, char *argv[])
     {
         if(strcmp(argv[1], "retrain") == 0)
         {
+            _log = 1;
             trainDataset("tgmsg.txt");
             exit(0);
         }
@@ -1011,6 +1021,13 @@ int main(int argc, char *argv[])
         if(strcmp(argv[1], "rnd") == 0)
         {
             printf("> %.2f\n", rndDaisy());
+            exit(0);
+        }
+
+        if(strcmp(argv[1], "gen") == 0)
+        {
+            _log = 1;
+            trainGenerator("out.txt");
             exit(0);
         }
 
