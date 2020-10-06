@@ -25,7 +25,7 @@
 #define DIGEST_SIZE 16
 #define FIRSTLAYER_SIZE 256
 #define HIDDEN_SIZE 512
-#define DATA_SIZE 1228
+#define DATA_SIZE 20000
 #define TABLE_SIZE_MAX 80000
 #define MESSAGE_SIZE 256
 
@@ -882,9 +882,10 @@ void trainGenerator(const char* file)
             // convert output to string of words
             if(_log == 1)
                 printf("[%.2f] ", last_error);
+            const double pre1 = TABLE_SIZE_H / 3.141592654;
             for(int i = 0; i < DIGEST_SIZE; i++)
             {
-                const double ind = (output[i]+1.57079632679)*1547.304356744; //arctan conversion
+                const double ind = (output[i]+1.57079632679)*pre1; //arctan conversion
                 if(output[i] != 0.0)
                 {
                     fprintf(f, "%s ", wtable[(int)ind]);
