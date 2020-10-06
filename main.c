@@ -1002,8 +1002,8 @@ int main(int argc, char *argv[])
             timestamp();
             loadTable("tgdict.txt");
             trainDataset("tgmsg.txt");
-            trainGenerator("out.txt");
             clearFile("tgmsg.txt");
+            trainGenerator("out.txt");
             printf("Just generated a new dataset.\n\n");
         }
 
