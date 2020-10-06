@@ -26,7 +26,7 @@
             exit;
         }
         $msg = $j->{'message'}->{'text'};
-        $ss = preg_replace("/[^a-z ]/", '', strtolower($msg));
+        $ss = preg_replace("/[^a-z@ ]/", '', strtolower($msg));
         //$ss = preg_replace("\b[a-z]{1,2}\b", '', $ss);
         $pp = explode(' ', $ss);
         $pp = array_slice($pp, 0, 16);
