@@ -774,7 +774,6 @@ void trainDataset(const char* file)
              if(_log == 1)
                 printf("Training Iteration (%u / %u) [%u / %u]\n RAND | REAL\n", i+1, DATA_SIZE, j+1, TRAINING_LOOPS);
 
-            // only outputting the random generations
             if(_log == 1)
             {
                 for(int k = 0; k < DIGEST_SIZE; k++)
