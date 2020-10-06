@@ -4,9 +4,9 @@ A telegram bot based on DaisyGANv2 with some added nitro !
 It has an extra hidden layer, and can run in the background as a service while a PHP script aggregates data for it, the bot will re-compute it's network, and generate 10,000 quotes, every x messages that are aggregated by the PHP script.
 
 ## Install
-- Compile main.c by running compile.sh
-- Update the BOT KEY / ID in the tgmain.php and copy over to your `www` directory.
-- Copy over one of the main.c binaries, such as `cfdgan` to the www directory
+- Compile `main.c` by running `compile.sh`
+- Update the BOT KEY / ID in the `tgmain.php` and copy over to your `www` directory.
+- Copy over one of the `main.c` binaries, such as `cfdgan` to the www directory
 - `cd` into the `www` diretory and execute `cfdgan` as sudo.
 
 ## Example Usage
