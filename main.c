@@ -1035,7 +1035,7 @@ int main(int argc, char *argv[])
     printf("Running ! ...\n\n");
     while(1)
     {
-        if(countLines("tgmsg.txt") == 1228)
+        if(countLines("tgmsg.txt") >= 1228)
         {
             timestamp();
             loadTable("tgdict.txt");
