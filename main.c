@@ -24,18 +24,19 @@
 
 #define DIGEST_SIZE 16
 #define FIRSTLAYER_SIZE 256
-#define HIDDEN_SIZE 512
+#define HIDDEN_SIZE 1024
 #define DATA_SIZE 1228
 #define TABLE_SIZE_MAX 80000
 #define MESSAGE_SIZE 256
 
-#define TRAINING_LOOPS 1
+#define TRAINING_LOOPS 3
 
 uint  _activator = 5;
 uint  _optimiser = 0;
 float _lrate = 0.003;
 float _lmomentum = 0.9;
-float _dropout = 0.5; //chance of neuron droput 0.3 = 30%
+float _dropout = 0.3; //chance of neuron droput 0.3 = 30%
+float _wdecay = 0;
 
 uint _log = 0;
 
@@ -543,6 +544,10 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
         const float error = error_override == 0 ? eo - ro : error_override - ro; // error gradient
         for(uint i = 0; i < p->weights; i++)
         {
+            // Weight Decay
+            if(_wdecay != 0)
+                p->data[i] *= (1.0 - _wdecay);
+
             // Regular Gradient Descent
             if(_optimiser == 0)
                 p->data[i] += error * in[i] * _lrate;
@@ -563,6 +568,10 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
                 p->data[i] += p->momentum[i];
             }
         }
+
+        // Weight Decay
+        if(_wdecay != 0)
+            p->bias *= (1.0 - _wdecay);
 
         // Regular Gradient Descent
         if(_optimiser == 0)
@@ -755,33 +764,24 @@ void trainDataset(const char* file)
             // train discriminator on data
             doDiscriminator(&digest[i][0], 1);
 
-            // for(int k = 0; k < DIGEST_SIZE; k++)
-            // {
-            //     printf("%.2f \n", digest[i][k]);
-            //     if(digest[i][k] < 0.0)
-            //         sleep(3);
-            // }
-            // printf("\n");
-
-            // train discriminator on generator
-            float input[DIGEST_SIZE] = {0};
+            // detrain discriminator on random word sequences 
+            float output[DIGEST_SIZE] = {0};
             const int len = uRand(1, DIGEST_SIZE-1);
             for(int i = 0; i < len; i++)
-                input[i] = (((double)uRand(0, TABLE_SIZE))/TABLE_SIZE_H)-1.0;
-                
-            float output[DIGEST_SIZE] = {0};
-            doGenerator(0, &input[0], &output[0]);
+                output[i] = (((double)uRand(0, TABLE_SIZE))/TABLE_SIZE_H)-1.0; //uRandWeight(-1, 1);
             doDiscriminator(&output[0], 0);
 
+             if(_log == 1)
+                printf("Training Iteration (%u / %u) [%u / %u]\n RAND | REAL\n", i+1, DATA_SIZE, j+1, TRAINING_LOOPS);
+
+            // only outputting the random generations
             if(_log == 1)
             {
                 for(int k = 0; k < DIGEST_SIZE; k++)
-                    printf("%.2f \n", output[k]);
+                    printf("%+.2f : %+.2f\n", output[k], digest[i][k]);
 
                 printf("\n");
             }
-            if(_log == 1)
-                printf("Training Iteration (%u / %u) [%u / %u]\n", i+1, DATA_SIZE, j+1, TRAINING_LOOPS);
 
             //usleep(100000);
         }
