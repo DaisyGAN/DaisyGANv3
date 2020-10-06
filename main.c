@@ -29,13 +29,13 @@
 #define TABLE_SIZE_MAX 80000
 #define MESSAGE_SIZE 256
 
-#define TRAINING_LOOPS 3
+#define TRAINING_LOOPS 6
 
 uint  _activator = 5;
 uint  _optimiser = 0;
 float _lrate = 0.003;
 float _lmomentum = 0.9;
-float _dropout = 0.3; //chance of neuron droput 0.3 = 30%
+float _dropout = 0.5; //chance of neuron droput 0.3 = 30%
 float _wdecay = 0;
 
 uint _log = 0;
