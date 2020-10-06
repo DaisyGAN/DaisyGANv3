@@ -29,7 +29,7 @@
 #define TABLE_SIZE_MAX 80000
 #define MESSAGE_SIZE 256
 
-#define TRAINING_LOOPS 6
+#define TRAINING_LOOPS 1
 
 uint  _activator = 5;
 uint  _optimiser = 0;
