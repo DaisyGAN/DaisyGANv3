@@ -11,7 +11,7 @@
     // file_put_contents("/var/www/html/m.txt", file_get_contents("php://input") . "\n\n", FILE_APPEND | LOCK_EX);
     // exit;
 
-    $token = '1363743429:AAFpe5Afqfac3b2aruw7nf53GM5CuXXdE4w';
+    $token = '<BOT KEY>';
     $j = json_decode(file_get_contents("php://input"));
 
     function appendFileUnique($fp, $line)
