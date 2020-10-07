@@ -884,11 +884,11 @@ void trainGenerator(const char* file)
             // convert output to string of words
             if(_log == 1)
                 printf("[%.2f] ", last_error);
-            const double pre1 = (TABLE_SIZE_H-1) / 3.141592654;
+            const double pre1 = TABLE_SIZE_H / 3.141592654;
             for(int i = 0; i < DIGEST_SIZE; i++)
             {
                 const double ind = (output[i]+1.57079632679)*pre1; //arctan conversion
-                if(output[i] != 0.0)
+                if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
                 {
                     fprintf(f, "%s ", wtable[(int)ind]);
                     if(_log == 1)
