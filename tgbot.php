@@ -39,7 +39,7 @@
         foreach($pps as $p)
             if(strlen($p) <= 16)
                 $str .= $p . " ";
-        rtrim($str, ' ');
+        $str = rtrim($str, ' ');
 
         appendFileUnique("tgmsg.txt", substr($str, 0, 256));
 
