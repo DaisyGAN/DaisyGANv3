@@ -4,6 +4,9 @@
     https://github.com/DaisyGAN/
 --------------------------------------------------
     DaisyGANv3 / PortTalbot
+    
+    I changed from digesting 1228 messages every 333 seconds
+    to; 42 messages every 9 seconds minimum.
 */
 
 #pragma GCC diagnostic ignored "-Wunused-result"
@@ -25,7 +28,8 @@
 #define DIGEST_SIZE 16
 #define FIRSTLAYER_SIZE 256
 #define HIDDEN_SIZE 1024
-#define DATA_SIZE 1228
+#define DATA_SIZE 42
+#define OUTPUT_QUOTES 333
 #define TABLE_SIZE_MAX 80000
 #define MESSAGE_SIZE 256
 
@@ -81,11 +85,12 @@ void loadTable(const char* file)
     if(f)
     {
         uint index = 0;
-        while(fgets(wtable[index], DIGEST_SIZE, f) != NULL)
+        while(fgets(wtable[index], DIGEST_SIZE+1, f) != NULL) //+1 for the end line
         {
-            wtable[index][strlen(wtable[index])-1] = 0x00; //remove '\n'
-            wtable[index][DIGEST_SIZE-1] = 0x00;
-            //printf("> %s : %u\n", wtable[index], index);
+            char* pos = strchr(wtable[index], '\n');
+            if(pos != NULL)
+                *pos = '\0';
+            printf("> %s : %u\n", wtable[index], index);
             index++;
             if(index == TABLE_SIZE_MAX)
                 break;
@@ -421,6 +426,7 @@ static inline float sigmoid(float x)
 static inline float fSigmoid(float x)
 {
     return x / (1 + fabs(x));
+    //return 0.5 * (x / (1 + abs(x))) + 0.5;
 }
 
 static inline float swish(float x)
@@ -454,7 +460,7 @@ static inline float leakyReLU6(float x)
     return x;
 }
 
-static inline float smoothReLU(float x)
+static inline float smoothReLU(float x) //aka softplus
 {
     return log(1 + exp(x));
 }
@@ -735,7 +741,9 @@ void trainDataset(const char* file)
         uint index = 0;
         while(fgets(line, MESSAGE_SIZE, f) != NULL)
         {
-            line[strlen(line)-1] = 0x00; //remove '\n'
+            char* pos = strchr(line, '\n');
+            if(pos != NULL)
+                *pos = '\0';
             uint i = 0;
             char* w = strtok(line, " ");
             //printf("> %s : %i\n", line, index);
@@ -866,7 +874,7 @@ void trainGenerator(const char* file)
     FILE* f = fopen(file, "w");
     if(f != NULL)
     {
-        for(int k = 0; k < 10000; k++)
+        for(int k = 0; k < OUTPUT_QUOTES*88; k++)
         {
             // random generator input
             float input[DIGEST_SIZE] = {0};
@@ -891,8 +899,8 @@ void trainGenerator(const char* file)
                 if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
                 {
                     fprintf(f, "%s ", wtable[(int)ind]);
-                    if(_log == 1)
-                        printf("%s ", wtable[(int)ind]);
+                    if(_log == 1 && wtable[(int)ind] == 0x00)
+                        printf("%s (%i) ", wtable[(int)ind], (int)ind);
                 }
             }
             fprintf(f, "\n");
@@ -938,6 +946,7 @@ int main(int argc, char *argv[])
 
     // load lookup table
     loadTable("tgdict.txt");
+    return 0;
 
     // are we issuing any commands?
     if(argc == 3)
@@ -1012,7 +1021,7 @@ int main(int argc, char *argv[])
             printf("Time Taken: %.2f mins\n\n", ((double)(time(0)-st)) / 60.0);
         }
 
-        sleep(333);
+        sleep(9);
     }
 
     // done
