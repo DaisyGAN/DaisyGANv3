@@ -15,6 +15,9 @@
     making temp buffer removal of the newline char superflous.
     Also 16 chars vs 15 chars per word seems to be make or break.
     Maybe I should just allow longer words in general ?
+    But no because, I think words longer than 16 chars are
+    most likely to be garble like url strings etc.
+    This cache hit is not the end of the world.
     
 */
 
