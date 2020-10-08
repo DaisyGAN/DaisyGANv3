@@ -70,7 +70,7 @@ ptron g4[DIGEST_SIZE];
 float digest[DATA_SIZE][DIGEST_SIZE] = {0};
 
 //word lookup table / index
-char wtable[TABLE_SIZE_MAX][DIGEST_SIZE] = {0};
+char wtable[TABLE_SIZE_MAX][DIGEST_SIZE+2] = {0}; //+2
 uint TABLE_SIZE = 0;
 uint TABLE_SIZE_H = 0;
 
@@ -85,7 +85,7 @@ void loadTable(const char* file)
     if(f)
     {
         uint index = 0;
-        while(fgets(wtable[index], DIGEST_SIZE+2, f) != NULL) //+1 for the end line
+        while(fgets(wtable[index], DIGEST_SIZE+2, f) != NULL) //+2
         {
             char* pos = strchr(wtable[index], '\n');
             if(pos != NULL)
