@@ -85,7 +85,7 @@ void loadTable(const char* file)
     if(f)
     {
         uint index = 0;
-        while(fgets(wtable[index], DIGEST_SIZE+1, f) != NULL) //+1 for the end line
+        while(fgets(wtable[index], DIGEST_SIZE+2, f) != NULL) //+1 for the end line
         {
             char* pos = strchr(wtable[index], '\n');
             if(pos != NULL)
