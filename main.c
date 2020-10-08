@@ -35,12 +35,12 @@
 
 #define TRAINING_LOOPS 1
 
-uint  _activator = 5;
-uint  _optimiser = 0;
-float _lrate = 0.003;
-float _lmomentum = 0.9;
-float _dropout = 0.5; //chance of neuron droput 0.3 = 30%
-float _wdecay = 0;
+const uint  _activator = 5;
+const uint  _optimiser = 0;
+const float _dropout = 0.5; //chance of neuron droput 0.3 = 30%
+const float _lrate = 0.003;
+const float _lmomentum = 0.9;
+const float _wdecay = 0;
 
 uint _log = 0;
 
@@ -803,7 +803,7 @@ void trainDataset(const char* file)
 
 void consoleAsk()
 {
-    // what percentage daisy is this ?
+    // what percentage human is this ?
     while(1)
     {
         char str[MESSAGE_SIZE] = {0};
@@ -823,11 +823,11 @@ void consoleAsk()
         }
 
         const float r = doDiscriminator(nstr, -2);
-        printf("This is %.2f%% (%.2f) Daisy.\n", (r+1.57079632679)*31.830988618, r); //arctan conversion
+        printf("This is %.2f%% (%.2f) Human.\n", (r+1.57079632679)*31.830988618, r); //arctan conversion
     }
 }
 
-float isDaisy(char* str)
+float isHuman(char* str)
 {
     float nstr[DIGEST_SIZE] = {0};
 
@@ -846,7 +846,7 @@ float isDaisy(char* str)
     return (r+1.57079632679)*31.830988618; //arctan conversion
 }
 
-float rndDaisy()
+float rndScentence()
 {
     float nstr[DIGEST_SIZE] = {0};
     const int len = uRand(1, DIGEST_SIZE-1);
@@ -893,14 +893,19 @@ void trainGenerator(const char* file)
             if(_log == 1)
                 printf("[%.2f] ", last_error);
             const double pre1 = TABLE_SIZE_H / 3.141592654;
+            int last_index = -1;
             for(int i = 0; i < DIGEST_SIZE; i++)
             {
                 const double ind = (( ((double)output[i])+1.57079632679 ) *pre1)+0.5; //arctan conversion
                 if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
                 {
-                    fprintf(f, "%s ", wtable[(int)ind]);
+                    const int new_index = (int)ind;
+                    if(new_index == last_index) //stop the bot repeating words
+                        continue;
+                    last_index = new_index;
+                    fprintf(f, "%s ", wtable[new_index]);
                     if(_log == 1)
-                        printf("%s (%i) ", wtable[(int)ind], (int)ind);
+                        printf("%s ", wtable[new_index]); //printf("%s (%i) ", wtable[(int)ind], (int)ind);
                 }
             }
             fprintf(f, "\n");
@@ -974,7 +979,7 @@ int main(int argc, char *argv[])
 
         if(strcmp(argv[1], "rnd") == 0)
         {
-            printf("> %.2f\n", rndDaisy());
+            printf("> %.2f\n", rndScentence());
             exit(0);
         }
 
@@ -989,14 +994,14 @@ int main(int argc, char *argv[])
         {
             while(1)
             {
-                printf("> %.2f\n\n", rndDaisy());
+                printf("> %.2f\n\n", rndScentence());
                 //usleep(100000);
             }
         }
 
         char in[MESSAGE_SIZE] = {0};
         snprintf(in, MESSAGE_SIZE, "%s", argv[1]);
-        printf("%.2f\n", isDaisy(in));
+        printf("%.2f\n", isHuman(in));
         exit(0);
     }
 
