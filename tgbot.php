@@ -7,14 +7,7 @@
     {
         $data = file_get_contents($fp);
         if(strpos($data, $line . "\n") === false)
-        {
-            $fh = fopen($fp, 'a');
-            if($fh)
-            {
-                fwrite($fh, $line . "\n");
-                fclose($fh);
-            }
-        }
+            file_put_contents($fp, $line . "\n", FILE_APPEND | LOCK_EX);
     }
 
     if(isset($j->{'message'}->{'text'}))
