@@ -4,7 +4,7 @@
     https://github.com/DaisyGAN/
 --------------------------------------------------
     DaisyGANv3 / PortTalbot
-    
+
     I changed from digesting 1228 messages every 333 seconds
     to; 42 messages every 9 seconds minimum.
 */
@@ -90,7 +90,7 @@ void loadTable(const char* file)
             char* pos = strchr(wtable[index], '\n');
             if(pos != NULL)
                 *pos = '\0';
-            printf("> %s : %u\n", wtable[index], index);
+            //printf("> %s : %u\n", wtable[index], index);
             index++;
             if(index == TABLE_SIZE_MAX)
                 break;
@@ -899,7 +899,7 @@ void trainGenerator(const char* file)
                 if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
                 {
                     fprintf(f, "%s ", wtable[(int)ind]);
-                    if(_log == 1 && wtable[(int)ind] == 0x00)
+                    if(_log == 1)
                         printf("%s (%i) ", wtable[(int)ind], (int)ind);
                 }
             }
@@ -946,7 +946,6 @@ int main(int argc, char *argv[])
 
     // load lookup table
     loadTable("tgdict.txt");
-    return 0;
 
     // are we issuing any commands?
     if(argc == 3)
