@@ -895,7 +895,7 @@ void trainGenerator(const char* file)
             const double pre1 = TABLE_SIZE_H / 3.141592654;
             for(int i = 0; i < DIGEST_SIZE; i++)
             {
-                const double ind = ((output[i]+1.57079632679)*pre1)+0.5; //arctan conversion
+                const double ind = (( ((double)output[i])+1.57079632679 ) *pre1)+0.5; //arctan conversion
                 if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
                 {
                     fprintf(f, "%s ", wtable[(int)ind]);
