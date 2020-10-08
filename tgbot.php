@@ -12,7 +12,7 @@
 
     if(isset($j->{'message'}->{'text'}))
     {
-        if(strstr($j->{'message'}->{'text'}, "/quote") != FALSE)
+        if(strpos($j->{'message'}->{'text'}, "/quote") !== FALSE)
         {
             $file = file("out.txt"); 
             $line = $file[rand(0, count($file) - 1)];
