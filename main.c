@@ -7,6 +7,15 @@
 
     I changed from digesting 1228 messages every 333 seconds
     to; 42 messages every 9 seconds minimum.
+    
+    #1 :: I should have limited the max word len to 15 and
+    pre-trim the newline char in a temp buffer, but since
+    I have a wordlist of 16 chars max already I might as
+    well waste the extra two bytes due to cache padding
+    making temp buffer removal of the newline char superflous.
+    Also 16 chars vs 15 chars per word seems to be make or break.
+    Maybe I should just allow longer words in general ?
+    
 */
 
 #pragma GCC diagnostic ignored "-Wunused-result"
@@ -70,7 +79,7 @@ ptron g4[DIGEST_SIZE];
 float digest[DATA_SIZE][DIGEST_SIZE] = {0};
 
 //word lookup table / index
-char wtable[TABLE_SIZE_MAX][DIGEST_SIZE+2] = {0}; //+2 for newline and null terminator 
+char wtable[TABLE_SIZE_MAX][DIGEST_SIZE+2] = {0}; //+2 for newline and null terminator ref[#1]
 uint TABLE_SIZE = 0;
 uint TABLE_SIZE_H = 0;
 
