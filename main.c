@@ -70,7 +70,7 @@ ptron g4[DIGEST_SIZE];
 float digest[DATA_SIZE][DIGEST_SIZE] = {0};
 
 //word lookup table / index
-char wtable[TABLE_SIZE_MAX][DIGEST_SIZE+2] = {0}; //+2
+char wtable[TABLE_SIZE_MAX][DIGEST_SIZE+2] = {0}; //+2 for newline and null terminator 
 uint TABLE_SIZE = 0;
 uint TABLE_SIZE_H = 0;
 
