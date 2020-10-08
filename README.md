@@ -1,9 +1,9 @@
 # PortTalbot
 A telegram bot / DaisyGANv3.
 
-It has an extra hidden layer and can run in the background as a service while a PHP script aggregates data for it; the bot will re-compute its network and generate 10,000 quotes for every 1228 messages that are aggregated by the PHP script.
+It has an extra hidden layer and can run in the background as a service while a PHP script aggregates data for it; the bot will re-compute its network and generate 333 quotes for every 42 messages that are aggregated by the PHP script.
 
-Essentially the bot digests chunks of 1228 unique messages in each iteration, which compounds each training iteration on top of the last iteration. In this manner, the neural network weights evolve with each training iteration. Aka, the bot learns over time rather than starting afresh with each iteration.
+Essentially the bot digests chunks of 42 unique messages in each iteration, which compounds each training iteration on top of the last iteration. In this manner, the neural network weights evolve with each training iteration. Aka, the bot learns over time rather than starting afresh with each iteration.
 
 ## Install
 - Compile `main.c` by running `compile.sh`
