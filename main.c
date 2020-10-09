@@ -885,7 +885,7 @@ void trainGenerator(const char* file)
     FILE* f = fopen(file, "w");
     if(f != NULL)
     {
-        for(int k = 0; k < OUTPUT_QUOTES*88; k++)
+        for(int k = 0; k < OUTPUT_QUOTES; k++)
         {
             // random generator input
             float input[DIGEST_SIZE] = {0};
