@@ -30,7 +30,7 @@
 
         $str = "";
         foreach($pps as $p)
-            if(strlen($p) <= 16)
+            if(strlen($p) <= 16 && $p != "" && $p != " ")
                 $str .= $p . " ";
         $str = rtrim($str, ' ');
 
