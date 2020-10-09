@@ -7,7 +7,7 @@
 
     I changed from digesting 1228 messages every 333 seconds
     to; 42 messages every 9 seconds minimum.
-    
+
     #1 :: I should have limited the max word len to 15 and
     pre-trim the newline char in a temp buffer, but since
     I have a wordlist of 16 chars max already I might as
@@ -18,7 +18,6 @@
     But no because, I think words longer than 16 chars are
     most likely to be garble like url strings etc.
     This cache hit is not the end of the world.
-    
 */
 
 #pragma GCC diagnostic ignored "-Wunused-result"
@@ -782,7 +781,7 @@ void trainDataset(const char* file)
         for(int i = 0; i < DATA_SIZE; i++)
         {
             // train discriminator on data
-            doDiscriminator(&digest[i][0], 1);
+            doDiscriminator(&digest[i][0], 1.57079632679);
 
             // detrain discriminator on random word sequences 
             float output[DIGEST_SIZE] = {0};
@@ -886,7 +885,7 @@ void trainGenerator(const char* file)
     FILE* f = fopen(file, "w");
     if(f != NULL)
     {
-        for(int k = 0; k < OUTPUT_QUOTES; k++)
+        for(int k = 0; k < OUTPUT_QUOTES*88; k++)
         {
             // random generator input
             float input[DIGEST_SIZE] = {0};
@@ -896,15 +895,15 @@ void trainGenerator(const char* file)
 
             // do generator
             float output[DIGEST_SIZE] = {0};
-            doGenerator(last_error, &input[0], &output[0]);
+            doGenerator(last_error * 0.3, &input[0], &output[0]);
 
             // feed generator output into discriminator input, take the error, sigmoid it to 0-1, take the loss, put it back through as the error for the next generation
-            last_error = crossEntropy(sigmoid(doDiscriminator(&output[0], -2)), 1);
+            last_error = crossEntropy(sigmoid(3.141592654 - (doDiscriminator(&output[0], -2) + 1.57079632679)), 1);
 
             // convert output to string of words
             if(_log == 1)
                 printf("[%.2f] ", last_error);
-            const double pre1 = TABLE_SIZE_H / 3.141592654;
+            const double pre1 = TABLE_SIZE / 3.141592654;
             int last_index = -1;
             for(int i = 0; i < DIGEST_SIZE; i++)
             {
