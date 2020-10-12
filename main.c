@@ -131,7 +131,7 @@ void saveWeights()
     FILE* f = fopen("weights.dat", "w");
     if(f != NULL)
     {
-        for(uint i = 0; i < DIGEST_SIZE; i++)
+        for(uint i = 0; i < FIRSTLAYER_SIZE; i++)
         {
             if(fwrite(&d1[i].data[0], 1, d1[i].weights*sizeof(float), f) != d1[i].weights*sizeof(float))
                 printf("ERROR fwrite() in saveWeights() #1w\n");
@@ -201,7 +201,7 @@ void loadWeights()
         return;
     }
 
-    for(uint i = 0; i < DIGEST_SIZE; i++)
+    for(uint i = 0; i < FIRSTLAYER_SIZE; i++)
     {
         while(fread(&d1[i].data[0], 1, d1[i].weights*sizeof(float), f) != d1[i].weights*sizeof(float))
             sleep(333);
