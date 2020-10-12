@@ -1,4 +1,4 @@
-# PortTalbot
+# PortTalbotv1
 A telegram bot / DaisyGANv3.
 
 It has an extra hidden layer and can run in the background as a service while a PHP script aggregates data for it; the bot will re-compute its network and generate 333 quotes for every 42 messages at a minimum interval of 9 seconds which are aggregated by the PHP script.
