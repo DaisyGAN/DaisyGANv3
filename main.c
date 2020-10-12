@@ -37,7 +37,7 @@
 #define uint uint32_t
 
 #define DIGEST_SIZE 16
-#define FIRSTLAYER_SIZE 256
+#define FIRSTLAYER_SIZE 512
 #define HIDDEN_SIZE 1024
 #define DATA_SIZE 42
 #define OUTPUT_QUOTES 333
@@ -47,7 +47,7 @@
 #define TRAINING_LOOPS 1
 
 const uint  _activator = 5;
-const uint  _optimiser = 0;
+const uint  _optimiser = 2;
 const float _dropout = 0.5; //chance of neuron droput 0.3 = 30%
 const float _lrate = 0.003;
 const float _lmomentum = 0.9;
@@ -572,17 +572,18 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
             // Regular Momentum
             if(_optimiser == 1)
             {
-                p->momentum[i] = _lmomentum * p->momentum[i] + (error * in[i] * _lrate);
-                p->data[i] += p->momentum[i];
+                const float err = (error * in[i] * _lrate);
+                p->data[i] += err + _lmomentum * p->momentum[i];
+                p->momentum[i] = err;
             }
             
             // Nesterov (NAG) momentum
             if(_optimiser == 2)
             {
                 const float g = error * in[i] * _lrate;
-                const float l = p->data[i] + p->momentum[i];
-                p->momentum[i] = _lmomentum * p->momentum[i] + g * l;
-                p->data[i] += p->momentum[i];
+                const float l = p->data[i] - _lmomentum * p->momentum[i];
+                p->data[i] += g * l + _lmomentum * p->momentum[i];
+                p->momentum[i] = g;
             }
         }
 
@@ -597,15 +598,18 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
         // Regular Momentum
         if(_optimiser == 1)
         {
-            p->bias_momentum = _lmomentum * p->bias_momentum + (error * _lrate);
-            p->bias += p->bias_momentum;
+            const float err = (error * _lrate);
+            p->bias += err + _lmomentum * p->bias_momentum;
+            p->bias_momentum = err;
         }
         
         // Nesterov (NAG) momentum
         if(_optimiser == 2)
         {
-            p->bias_momentum = _lmomentum * p->bias_momentum + (error * _lrate) * (p->bias + p->bias_momentum);
-            p->bias += p->bias_momentum;
+            const float g = error * _lrate;
+            const float l = p->bias - _lmomentum * p->bias_momentum;
+            p->bias += g * l + _lmomentum * p->bias_momentum;
+            p->bias_momentum = g;
         }
     }
 
@@ -660,75 +664,6 @@ void doGenerator(const float error, const float* input, float* output)
     for(int i = 0; i < DIGEST_SIZE; i++)
         output[i] = doPerceptron(&o3[0], &g4[i], error, -2);
 }
-
-/*
---------------------------------------------------
-    Defunct Backprop Method Start
---------------------------------------------------
-*/
-// void doSGD(float* weight, float* momentum, const float error, const float _lrate)
-// {
-//     // Regular Gradient Descent
-//     if(_optimiser == 0)
-//     {
-//         weight[0] += error * _lrate;
-//     }
-
-//     // Regular Momentum
-//     if(_optimiser == 1)
-//     {
-//         momentum[0] = _lmomentum * momentum[0] + (error * _lrate);
-//         weight[0] += *momentum;
-//     }
-    
-//     // Nesterov (NAG) momentum
-//     if(_optimiser == 2)
-//     {
-//         momentum[0] = _lmomentum * momentum[0] + (error * _lrate) * (weight[0] + momentum[0]);
-//         weight[0] += momentum[0];
-//     }
-// }
-
-// void backpropGenerator(const float error, const float lrate)
-// {
-//     // layer one, inputs (fc)
-//     for(int i = 0; i < DIGEST_SIZE; i++)
-//     {
-//         const float layer_error = (1-(1/i))*error;
-
-//         for(int j = 0; j < g1[i].weights; j++)
-//             doSGD(&g1[i].data[j], &g1[i].momentum[j], layer_error, lrate);
-        
-//         doSGD(&g1[i].bias, &g1[i].bias_momentum, layer_error, lrate);
-//     }
-
-//     // layer two, hidden (fc expansion)
-//     for(int i = 0; i < HIDDEN_SIZE; i++)
-//     {
-//         const float layer_error = (1-(1/i))*error;
-
-//         for(int j = 0; j < g2[i].weights; j++)
-//             doSGD(&g2[i].data[j], &g2[i].momentum[j], layer_error, lrate);
-        
-//         doSGD(&g2[i].bias, &g2[i].bias_momentum, layer_error, lrate);
-//     }
-    
-//     // layer three, output (fc compression)
-//     for(int i = 0; i < DIGEST_SIZE; i++)
-//     {
-//         const float layer_error = (1-(1/i))*error;
-
-//         for(int j = 0; j < g3[i].weights; j++)
-//             doSGD(&g3[i].data[j], &g3[i].momentum[j], layer_error, lrate);
-        
-//         doSGD(&g3[i].bias, &g3[i].bias_momentum, layer_error, lrate);
-//     }
-// }
-/*
---------------------------------------------------
-    Defunct Backprop Method End
---------------------------------------------------
-*/
 
 float rmseDiscriminator()
 {
@@ -788,7 +723,7 @@ void trainDataset(const char* file)
             const int len = uRand(1, DIGEST_SIZE-1);
             for(int i = 0; i < len; i++)
                 output[i] = (((double)uRand(0, TABLE_SIZE))/TABLE_SIZE_H)-1.0; //uRandWeight(-1, 1);
-            doDiscriminator(&output[0], 0);
+            doDiscriminator(&output[0], -1.57079632679);
 
              if(_log == 1)
                 printf("Training Iteration (%u / %u) [%u / %u]\n RAND | REAL\n", i+1, DATA_SIZE, j+1, TRAINING_LOOPS);
@@ -885,7 +820,7 @@ void trainGenerator(const char* file)
     FILE* f = fopen(file, "w");
     if(f != NULL)
     {
-        for(int k = 0; k < OUTPUT_QUOTES; k++)
+        for(int k = 0; k < OUTPUT_QUOTES; NULL)
         {
             // random generator input
             float input[DIGEST_SIZE] = {0};
@@ -901,27 +836,32 @@ void trainGenerator(const char* file)
             last_error = crossEntropy(sigmoid(3.141592654 - (doDiscriminator(&output[0], -2) + 1.57079632679)), 1);
 
             // convert output to string of words
-            if(_log == 1)
-                printf("[%.2f] ", last_error);
-            const double pre1 = TABLE_SIZE / 3.141592654;
-            int last_index = -1;
-            for(int i = 0; i < DIGEST_SIZE; i++)
+            if(last_error <= 0.5)
             {
-                const double ind = (( ((double)output[i])+1.57079632679 ) *pre1)+0.5; //arctan conversion
-                if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
+                k++;
+
+                if(_log == 1)
+                    printf("[%.2f] ", last_error);
+                const double pre1 = TABLE_SIZE / 3.141592654;
+                int last_index = -1;
+                for(int i = 0; i < DIGEST_SIZE; i++)
                 {
-                    const int new_index = (int)ind;
-                    if(new_index == last_index) //stop the bot repeating words
-                        continue;
-                    last_index = new_index;
-                    fprintf(f, "%s ", wtable[new_index]);
-                    if(_log == 1)
-                        printf("%s ", wtable[new_index]); //printf("%s (%i) ", wtable[(int)ind], (int)ind);
+                    const double ind = (( ((double)output[i])+1.57079632679 ) *pre1)+0.5; //arctan conversion
+                    if(output[i] != 0.0 && ind < TABLE_SIZE && ind > 0)
+                    {
+                        const int new_index = (int)ind;
+                        if(new_index == last_index) //stop the bot repeating words
+                            continue;
+                        last_index = new_index;
+                        fprintf(f, "%s ", wtable[new_index]);
+                        if(_log == 1)
+                            printf("%s ", wtable[new_index]); //printf("%s (%i) ", wtable[(int)ind], (int)ind);
+                    }
                 }
+                fprintf(f, "\n");
+                if(_log == 1)
+                    printf("\n");
             }
-            fprintf(f, "\n");
-            if(_log == 1)
-                printf("\n");
 
             // back prop the generator [defunct method of backprop]
             //backpropGenerator(last_error, 0.001);
