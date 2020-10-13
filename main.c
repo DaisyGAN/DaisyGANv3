@@ -871,6 +871,8 @@ void trainGenerator(const char* file)
             //index++;
             //sleep(1);
         }
+        
+        fclose(f);
     }
 }
 
