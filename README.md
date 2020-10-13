@@ -17,4 +17,4 @@ Essentially the bot digests chunks of 42 unique messages in each iteration, whic
 - ```./cfdgan rnd``` - Get the percentage of likelyhood that the sampled dataset wrote a provided random message.
 - ```./cfdgan ask``` - A never ending console loop where you get to ask what percentage likelyhood the sampled dataset wrote a given message.
 - ```./cfdgan gen``` - The adversarial message generator.
-- ```./cfdgan``` - Telegram bot service, will digest the tsmsg.log every x messages and generate a new set of 10,000 quotes.
+- ```./cfdgan``` - Telegram bot service, will digest the tsmsg.txt every x messages and generate a new set of quotes.
