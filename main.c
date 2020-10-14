@@ -578,7 +578,7 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
             }
             
             // Nesterov (NAG) momentum
-            if(_optimiser == 2)
+            if(_optimiser == 2) //pretty sure I got this wrong
             {
                 const float g = error * in[i] * _lrate;
                 const float l = p->data[i] - _lmomentum * p->momentum[i];
@@ -604,7 +604,7 @@ float doPerceptron(const float* in, ptron* p, const float error_override, const 
         }
         
         // Nesterov (NAG) momentum
-        if(_optimiser == 2)
+        if(_optimiser == 2) //pretty sure I got this wrong
         {
             const float g = error * _lrate;
             const float l = p->bias - _lmomentum * p->bias_momentum;
@@ -862,14 +862,6 @@ void trainGenerator(const char* file)
                 if(_log == 1)
                     printf("\n");
             }
-
-            // back prop the generator [defunct method of backprop]
-            //backpropGenerator(last_error, 0.001);
-
-            // output error
-            //printf("[%u]ERROR: %.2f\n\n", index, last_error);
-            //index++;
-            //sleep(1);
         }
         
         fclose(f);
